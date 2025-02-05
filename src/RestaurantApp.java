@@ -47,15 +47,21 @@ public class RestaurantApp extends JFrame {
         ClientPanel clientPanel = new ClientPanel(mainPanel);
         OrderPanel orderPanel = new OrderPanel(mainPanel);
         TablePanel tablePanel = new TablePanel();
+        ReadOnlyProductPanel readOnlyProductPanel = new ReadOnlyProductPanel();
 
         // Ajouter les panels au CardLayout
         mainPanel.add(productPanel, "ProductPanel");
         mainPanel.add(clientPanel, "ClientPanel");
         mainPanel.add(orderPanel, "OrderPanel");
         mainPanel.add(tablePanel, "TablePanel");
+        mainPanel.add(readOnlyProductPanel, "ReadOnlyProductPanel");
 
         // Ajouter les éléments de menu
         menuProducts.add(productPanel.createMenuItem("Manage Products"));
+        menuProducts.add(new JMenuItem("View Products")).addActionListener(e -> {
+            CardLayout layout = (CardLayout) mainPanel.getLayout();
+            layout.show(mainPanel, "ReadOnlyProductPanel");
+        });
         menuClients.add(clientPanel.createMenuItem("Manage Clients"));
         menuOrders.add(orderPanel.createMenuItem("Manage Orders"));
         menuTables.add(new JMenuItem("Manage Tables")).addActionListener(e -> {

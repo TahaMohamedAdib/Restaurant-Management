@@ -9,18 +9,16 @@ public class TablePanel extends JPanel {
     private JTable table;
     private DefaultTableModel model;
     private Map<Integer, Table> tables = new HashMap<>();
-    private JTextField tableNumberField;
     private JTextField capacityField;
 
     public TablePanel() {
         setLayout(new BorderLayout());
 
         // Initialize components
-        model = new DefaultTableModel(new Object[]{"ID", "Table Number", "Capacity"}, 0);
+        model = new DefaultTableModel(new Object[]{"ID", "Capacity"}, 0);
         table = new JTable(model);
         JScrollPane scrollPane = new JScrollPane(table);
 
-        tableNumberField = new JTextField();
         capacityField = new JTextField();
 
         JButton btnAddTable = new JButton("Add Table");
@@ -33,10 +31,8 @@ public class TablePanel extends JPanel {
         styleButton(btnDeleteTable, new Color(46, 89, 137), Color.WHITE);
 
         // Form panel
-        JPanel formPanel = new JPanel(new GridLayout(4, 2, 10, 10));
+        JPanel formPanel = new JPanel(new GridLayout(3, 2, 10, 10));
         formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        formPanel.add(createStyledLabel("Table Number:"));
-        formPanel.add(tableNumberField);
         formPanel.add(createStyledLabel("Capacity:"));
         formPanel.add(capacityField);
         formPanel.add(btnAddTable);
@@ -72,7 +68,6 @@ public class TablePanel extends JPanel {
                 while (rs.next()) {
                     model.addRow(new Object[]{
                             rs.getInt("id"),
-                            rs.getString("tableNumber"),
                             rs.getInt("capacity")
                     });
                 }
@@ -86,7 +81,6 @@ public class TablePanel extends JPanel {
 
     // Method to add a new table
     private void addTable() {
-        String tableNumber = tableNumberField.getText();
         int capacity;
         try {
             capacity = Integer.parseInt(capacityField.getText());
@@ -99,9 +93,8 @@ public class TablePanel extends JPanel {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             try (Connection conn = DatabaseManager.getConnection();
-                 PreparedStatement ps = conn.prepareStatement("INSERT INTO tables (tableNumber, capacity, status) VALUES (?, ?, 'Available')")) {
-                ps.setString(1, tableNumber);
-                ps.setInt(2, capacity);
+                 PreparedStatement ps = conn.prepareStatement("INSERT INTO tables (capacity, status) VALUES (?, 'Available')")) {
+                ps.setInt(1, capacity);
                 ps.executeUpdate();
                 JOptionPane.showMessageDialog(this, "Table added successfully!");
             }
@@ -126,17 +119,15 @@ public class TablePanel extends JPanel {
         }
 
         int tableId = (int) model.getValueAt(selectedRow, 0);
-        String tableNumber = tableNumberField.getText();
         int capacity = Integer.parseInt(capacityField.getText());
 
         // Update database
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             try (Connection conn = DatabaseManager.getConnection();
-                 PreparedStatement ps = conn.prepareStatement("UPDATE tables SET tableNumber = ?, capacity = ? WHERE id = ?")) {
-                ps.setString(1, tableNumber);
-                ps.setInt(2, capacity);
-                ps.setInt(3, tableId);
+                 PreparedStatement ps = conn.prepareStatement("UPDATE tables SET capacity = ? WHERE id = ?")) {
+                ps.setInt(1, capacity);
+                ps.setInt(2, tableId);
                 ps.executeUpdate();
                 JOptionPane.showMessageDialog(this, "Table modified successfully!");
             }
